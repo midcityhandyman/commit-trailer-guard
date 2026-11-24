@@ -14,15 +14,15 @@ jobs:
   trailers:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           # Full history is needed so base..head can be walked.
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
 
-      # Replace your-org with the owner that hosts this action, and pin a
-      # tag or a full commit SHA.
-      - uses: your-org/commit-trailer-guard@v1
+      # Replace your-org with the owner that hosts this action and <commit-sha>
+      # with a full commit SHA. No release tag has been published.
+      - uses: your-org/commit-trailer-guard@<commit-sha>
         with:
           trailer-key: Change-Source
           value-pattern: "(human|bot)-[a-z0-9-]+"

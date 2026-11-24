@@ -111,11 +111,13 @@ def load_json_commits(path: str) -> List[Commit]:
     commits = []
     for index, item in enumerate(items):
         try:
-            commits.append(
-                Commit(str(item["sha"]), tuple(item.get("parents", [])), str(item["message"]))
-            )
+            sha, message, parents = item["sha"], item["message"], item.get("parents", [])
         except (KeyError, TypeError, AttributeError) as exc:
             raise ConfigError(f"commits file {path}: entry {index} needs sha and message") from exc
+        # A string here would be split into characters and read as a merge, which is skipped.
+        if not isinstance(parents, list) or not all(isinstance(p, str) for p in parents):
+            raise ConfigError(f"commits file {path}: entry {index} parents must be a list of SHAs")
+        commits.append(Commit(str(sha), tuple(parents), str(message)))
     return commits
 
 

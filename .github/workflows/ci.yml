@@ -16,8 +16,8 @@ jobs:
       matrix:
         python-version: ["3.10", "3.12"]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install test dependencies
@@ -26,3 +26,50 @@ jobs:
         run: python -m pytest -q
       - name: Run the offline demo and compare with the captured output
         run: python demo/run_demo.py | diff - demo/output.txt
+
+  # Runs action.yml itself on a hosted runner, against a scratch repository
+  # with real commits. The second run is expected to fail, so this job shows
+  # one error annotation for the "Fix typo" commit even when it is green.
+  action:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: guard
+      - name: Build a scratch repository with two good commits and one bad one
+        id: scratch
+        run: |
+          git init -q -b main .
+          git config user.name "Test User"
+          git config user.email "test@example.com"
+          git commit -q --allow-empty -m "Start project" -m "Change-Source: human-desktop"
+          echo "base=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          git commit -q --allow-empty -m "Add export job" -m "Change-Source: bot-exporter"
+          echo "good=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          git commit -q --allow-empty -m "Fix typo"
+          echo "bad=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Action passes on the compliant range
+        id: pass
+        uses: ./guard
+        with:
+          trailer-key: Change-Source
+          value-pattern: "(human|bot)-[a-z0-9-]+"
+          base-sha: ${{ steps.scratch.outputs.base }}
+          head-sha: ${{ steps.scratch.outputs.good }}
+      - name: Action fails on the range that holds the commit without a trailer
+        id: fail
+        continue-on-error: true
+        uses: ./guard
+        with:
+          trailer-key: Change-Source
+          value-pattern: "(human|bot)-[a-z0-9-]+"
+          base-sha: ${{ steps.scratch.outputs.base }}
+          head-sha: ${{ steps.scratch.outputs.bad }}
+      - name: Check both outcomes and the outputs
+        env:
+          PASS: ${{ steps.pass.outputs.result }}/${{ steps.pass.outputs.checked }}/${{ steps.pass.outputs.failed }}
+          FAIL: ${{ steps.fail.outcome }}/${{ steps.fail.outputs.result }}/${{ steps.fail.outputs.checked }}/${{ steps.fail.outputs.failed }}
+        run: |
+          echo "pass run: $PASS, fail run: $FAIL"
+          test "$PASS" = "pass/1/0"
+          test "$FAIL" = "failure/fail/2/1"

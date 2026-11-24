@@ -190,6 +190,16 @@ def test_from_json_rejects_malformed_entries(tmp_path):
     assert "needs sha and message" in out
 
 
+def test_from_json_rejects_parents_that_are_not_a_list(tmp_path):
+    # "parents": "aabb" used to become four one-letter parents, so the commit
+    # was skipped as a merge and the run passed without checking it.
+    path = tmp_path / "parents.json"
+    path.write_text(json.dumps([{"sha": BAD[0], "parents": "aabb", "message": BAD[2]}]), encoding="utf-8")
+    code, out = run(["--key", KEY, "--from-json", str(path)])
+    assert code == cli.EXIT_CONFIG
+    assert "parents must be a list" in out
+
+
 def test_demo_fixtures_give_the_documented_exit_codes():
     failing = str(ROOT / "demo" / "pr_failing.json")
     clean = str(ROOT / "demo" / "pr_clean.json")
@@ -241,6 +251,13 @@ def test_action_yml_and_env_example_cover_every_setting_the_cli_reads():
     for name in names:
         assert f"{name}:" in action, f"{name} missing from action.yml"
         assert name in env_example, f"{name} missing from .env.example"
+
+
+def test_readme_sample_output_is_copied_from_the_captured_demo_output():
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    block = readme.split("## What you will see", 1)[1].split("```")[1].strip()
+    assert "RESULT: FAIL" in block
+    assert block in (ROOT / "demo" / "output.txt").read_text(encoding="utf-8")
 
 
 def test_repo_contains_no_em_dashes():
