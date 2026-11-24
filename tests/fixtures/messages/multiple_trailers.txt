@@ -1,0 +1,7 @@
+Regenerate API client
+
+Generated from the spec.
+
+Reviewed-by: Alex Sample <alex.sample@example.com>
+Change-Source: bot-codegen
+Refs: TICKET-0142

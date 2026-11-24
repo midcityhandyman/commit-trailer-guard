@@ -1,0 +1,7 @@
+Long note
+
+Notes: first line of a folded value
+  that continues here
+Change-Source: human-laptop
+
+

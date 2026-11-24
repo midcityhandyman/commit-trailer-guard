@@ -1,0 +1,9 @@
+# Grandfather list for commit-trailer-guard.
+# One SHA per line. Full 40 character SHAs are best; prefixes of 7 or more
+# characters also work. Text after '#' is a comment.
+#
+# Only add commits that are already on the protected branch and cannot be
+# rewritten. Say why and when on each line.
+
+3c1f0a9d2b7e4f6a8c5d1e0b9a7f6e5d4c3b2a10  # 2026-01-12 pushed before the rule existed
+9e8d7c6b5a4f3e2d1c0b                      # 2026-02-03 hotfix made from a scratch clone

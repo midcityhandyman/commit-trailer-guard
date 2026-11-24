@@ -1,0 +1,29 @@
+# Example workflow. Copy to .github/workflows/trailer-guard.yml in the
+# repository you want to protect, then make the "trailers" job a required
+# status check (see docs/branch-protection-mirrored-repo.md).
+name: commit-trailer-guard
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  trailers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Full history is needed so base..head can be walked.
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      # Replace your-org with the owner that hosts this action, and pin a
+      # tag or a full commit SHA.
+      - uses: your-org/commit-trailer-guard@v1
+        with:
+          trailer-key: Change-Source
+          value-pattern: "(human|bot)-[a-z0-9-]+"
+          grandfather-file: .github/trailer-grandfather.txt

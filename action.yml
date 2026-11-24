@@ -1,0 +1,70 @@
+name: commit-trailer-guard
+description: Fail a pull request when any non merge commit lacks a required trailer line.
+author: commit-trailer-guard contributors
+branding:
+  icon: shield
+  color: blue
+
+inputs:
+  trailer-key:
+    description: Trailer key every non merge commit must carry, for example Change-Source.
+    required: true
+  value-pattern:
+    description: Regular expression the whole trailer value must match.
+    required: false
+    default: ".+"
+  grandfather-file:
+    description: Path (in the repository) of a file listing exempt SHAs, one per line. Empty disables it.
+    required: false
+    default: ""
+  grandfather-ref:
+    description: >-
+      Git ref the grandfather file is read from. Defaults to the pull request
+      base so a pull request cannot exempt its own commits.
+    required: false
+    default: ${{ github.event.pull_request.base.sha }}
+  grandfather-shas:
+    description: Extra exempt SHAs, comma or space separated.
+    required: false
+    default: ""
+  base-sha:
+    description: Base revision (exclusive). Defaults to the pull request base.
+    required: false
+    default: ${{ github.event.pull_request.base.sha }}
+  head-sha:
+    description: Head revision (inclusive). Defaults to the pull request head.
+    required: false
+    default: ${{ github.event.pull_request.head.sha }}
+
+outputs:
+  result:
+    description: pass or fail
+    value: ${{ steps.check.outputs.result }}
+  checked:
+    description: Number of commits checked (merge and grandfathered commits excluded).
+    value: ${{ steps.check.outputs.checked }}
+  failed:
+    description: Number of commits missing the trailer or carrying a bad value.
+    value: ${{ steps.check.outputs.failed }}
+  skipped:
+    description: Number of merge and grandfathered commits skipped.
+    value: ${{ steps.check.outputs.skipped }}
+
+runs:
+  using: composite
+  steps:
+    - name: Check commit trailers
+      id: check
+      shell: bash
+      # Inputs travel through the environment, never through the script text,
+      # so a hostile branch name or input cannot inject shell commands.
+      env:
+        TRAILER_KEY: ${{ inputs.trailer-key }}
+        TRAILER_VALUE_PATTERN: ${{ inputs.value-pattern }}
+        TRAILER_GRANDFATHER_FILE: ${{ inputs.grandfather-file }}
+        TRAILER_GRANDFATHER_REF: ${{ inputs.grandfather-ref }}
+        TRAILER_GRANDFATHER_SHAS: ${{ inputs.grandfather-shas }}
+        TRAILER_BASE_SHA: ${{ inputs.base-sha }}
+        TRAILER_HEAD_SHA: ${{ inputs.head-sha }}
+        PYTHONPATH: ${{ github.action_path }}
+      run: python3 -m trailer_guard

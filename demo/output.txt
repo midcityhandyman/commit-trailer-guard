@@ -1,0 +1,66 @@
+==============================================================================
+1. Pull request with problems, no grandfather list
+$ python -m trailer_guard --from-json demo/pr_failing.json --key Change-Source --value-pattern "(human|bot)-[a-z0-9-]+"
+------------------------------------------------------------------------------
+commit-trailer-guard: require 'Change-Source: <(human|bot)-[a-z0-9-]+>'
+  ok                   1a2b3c4d5e  Add intake form validation
+  MISSING              2b3c4d5e6f  Fix typo in scheduler config
+                                   -> no Change-Source trailer in the last paragraph
+  skip (merge)         3c4d5e6f70  Merge branch 'main' into feature/intake
+  BAD VALUE            4d5e6f7081  Tune retry backoff
+                                   -> value "Robot 7" does not match (human|bot)-[a-z0-9-]+
+  MISSING              5e6f708192  Document the trailer rule
+                                   -> no Change-Source trailer in the last paragraph
+  ok                   6f708192a3  Regenerate API client
+Checked 5 commits: 2 ok, 3 failed. Skipped 1 (1 merge, 0 grandfathered).
+RESULT: FAIL
+How to fix:
+  latest commit:  git commit --amend --no-edit --trailer "Change-Source: <value>"
+  older commits:  git rebase <base> -x 'git commit --amend --no-edit --trailer "Change-Source: <value>"'
+  The trailer must sit in the last paragraph of the message. Commits already on a
+  protected branch cannot be rewritten; add their SHAs to the grandfather list.
+exit code: 1
+
+==============================================================================
+2. Same pull request, old typo fix grandfathered
+$ python -m trailer_guard --from-json demo/pr_failing.json --key Change-Source --value-pattern "(human|bot)-[a-z0-9-]+" --grandfather-file demo/grandfather.txt
+------------------------------------------------------------------------------
+commit-trailer-guard: require 'Change-Source: <(human|bot)-[a-z0-9-]+>'
+  ok                   1a2b3c4d5e  Add intake form validation
+  skip (grandfathered) 2b3c4d5e6f  Fix typo in scheduler config
+  skip (merge)         3c4d5e6f70  Merge branch 'main' into feature/intake
+  BAD VALUE            4d5e6f7081  Tune retry backoff
+                                   -> value "Robot 7" does not match (human|bot)-[a-z0-9-]+
+  MISSING              5e6f708192  Document the trailer rule
+                                   -> no Change-Source trailer in the last paragraph
+  ok                   6f708192a3  Regenerate API client
+Checked 4 commits: 2 ok, 2 failed. Skipped 2 (1 merge, 1 grandfathered).
+RESULT: FAIL
+How to fix:
+  latest commit:  git commit --amend --no-edit --trailer "Change-Source: <value>"
+  older commits:  git rebase <base> -x 'git commit --amend --no-edit --trailer "Change-Source: <value>"'
+  The trailer must sit in the last paragraph of the message. Commits already on a
+  protected branch cannot be rewritten; add their SHAs to the grandfather list.
+exit code: 1
+
+==============================================================================
+3. Clean pull request (merge commit skipped, key match is case insensitive)
+$ python -m trailer_guard --from-json demo/pr_clean.json --key Change-Source --value-pattern "(human|bot)-[a-z0-9-]+"
+------------------------------------------------------------------------------
+commit-trailer-guard: require 'Change-Source: <(human|bot)-[a-z0-9-]+>'
+  ok                   a1b2c3d4e5  Add nightly export job
+  skip (merge)         b2c3d4e5f6  Merge branch 'main' into feature/export
+  ok                   c3d4e5f607  Cover export job with tests
+Checked 2 commits: 2 ok, 0 failed. Skipped 1 (1 merge, 0 grandfathered).
+RESULT: PASS
+exit code: 0
+
+==============================================================================
+4. Broken configuration (invalid regex) is reported as exit code 2, not as a pass
+$ python -m trailer_guard --from-json demo/pr_clean.json --key Change-Source --value-pattern "(human|bot"
+------------------------------------------------------------------------------
+commit-trailer-guard: configuration error: value pattern '(human|bot' is not a valid regex: missing ), unterminated subpattern at position 0
+exit code: 2
+
+==============================================================================
+exit codes: [1, 1, 0, 2] (expected [1, 1, 0, 2])

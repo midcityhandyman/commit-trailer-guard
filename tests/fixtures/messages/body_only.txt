@@ -1,0 +1,7 @@
+Document the rule
+
+Add a line like
+Change-Source: human-laptop
+to every commit.
+
+This closing paragraph is plain prose.

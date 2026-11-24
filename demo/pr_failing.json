@@ -1,0 +1,38 @@
+{
+  "description": "Synthetic pull request, oldest commit first. All SHAs and messages are invented.",
+  "commits": [
+    {
+      "sha": "1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d",
+      "parents": ["00aa11bb22cc33dd44ee55ff66778899aabbccdd"],
+      "message": "Add intake form validation\n\nReject empty phone and email fields before the record is saved.\n\nChange-Source: human-laptop\n"
+    },
+    {
+      "sha": "2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e",
+      "parents": ["1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d"],
+      "message": "Fix typo in scheduler config\n"
+    },
+    {
+      "sha": "3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f",
+      "parents": [
+        "2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e",
+        "77889900aabbccddeeff00112233445566778899"
+      ],
+      "message": "Merge branch 'main' into feature/intake\n"
+    },
+    {
+      "sha": "4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f70",
+      "parents": ["3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f"],
+      "message": "Tune retry backoff\n\nDouble the wait between attempts, capped at five minutes.\n\nChange-Source: Robot 7\n"
+    },
+    {
+      "sha": "5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f7081",
+      "parents": ["4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f70"],
+      "message": "Document the trailer rule\n\nEvery commit needs a line like\nChange-Source: human-laptop\nat the end of the message.\n\nThis paragraph comes last, so the line above is body text, not a trailer.\n"
+    },
+    {
+      "sha": "6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192",
+      "parents": ["5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f7081"],
+      "message": "Regenerate API client\n\nReviewed-by: Alex Sample <alex.sample@example.com>\nChange-Source: bot-codegen\n"
+    }
+  ]
+}

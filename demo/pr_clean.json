@@ -1,0 +1,23 @@
+{
+  "description": "Synthetic pull request where every non merge commit carries a valid trailer.",
+  "commits": [
+    {
+      "sha": "a1b2c3d4e5f60718293a4b5c6d7e8f9012345678",
+      "parents": ["00aa11bb22cc33dd44ee55ff66778899aabbccdd"],
+      "message": "Add nightly export job\n\nChange-Source: human-desktop\n"
+    },
+    {
+      "sha": "b2c3d4e5f60718293a4b5c6d7e8f9012345678a1",
+      "parents": [
+        "a1b2c3d4e5f60718293a4b5c6d7e8f9012345678",
+        "77889900aabbccddeeff00112233445566778899"
+      ],
+      "message": "Merge branch 'main' into feature/export\n"
+    },
+    {
+      "sha": "c3d4e5f60718293a4b5c6d7e8f9012345678a1b2",
+      "parents": ["b2c3d4e5f60718293a4b5c6d7e8f9012345678a1"],
+      "message": "Cover export job with tests\n\nchange-source: bot-test-writer\n"
+    }
+  ]
+}
