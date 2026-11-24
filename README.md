@@ -69,7 +69,7 @@ through environment variables.
 ## Run it
 
 No install step is needed; the checker uses only the Python standard library
-(3.9 or newer).
+(3.10 or newer).
 
 ```sh
 # 1. offline, against the synthetic pull request in this repo
@@ -123,7 +123,7 @@ python -m pytest
 `tests/fixtures/messages/` (valid, missing, wrong value, key mentioned only in
 the body, CRLF line endings, folded values and more). The command line layer
 is tested with a fake git runner, so the tests need no repository and no
-network. `.github/workflows/ci.yml` runs the tests on Python 3.9 and 3.12 and
+network. `.github/workflows/ci.yml` runs the tests on Python 3.10 and 3.12 and
 checks that the demo still produces `demo/output.txt`.
 
 ## Demo
